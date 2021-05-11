@@ -1,7 +1,5 @@
 package app;
 
-import app.layers.MainJob;
-
 public class App {
 
     public static void main (String[] args) {

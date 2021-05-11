@@ -1,6 +1,5 @@
-package app.layers;
+package app;
 
-import app.NeuralNetwork;
 import org.apache.commons.math3.util.Pair;
 
 import java.io.*;
@@ -11,10 +10,13 @@ import java.util.HashMap;
 public class MainJob {
 
     private static final Integer[] neuronsForLayers = new Integer[]{15, 70, 70, 2};
-    private static final Integer epochsNumber = 1000;
-    private static final Double studySpeed = 0.1;
+    private static final Integer epochsNumber = 5000;
+    private static final Double studySpeed = 0.04;
 
     private HashMap<Integer, Pair<Double, Double>> minAndMax;
+
+    private FileWriter errorKgfWriter;
+    private FileWriter errorGTotalWriter;
 
     private Double[][] trainStartData;
     private Double[][] trainResultData;
@@ -26,6 +28,7 @@ public class MainJob {
         try {
             preloadTrainData();
             preloadRealJobData();
+            preloadFileWriters();
             normalizeData();
             NeuralNetwork readyForJobNeuralNetwork = createReadyForJobNeuralNetwork();
             calculateRealJob(readyForJobNeuralNetwork);
@@ -40,8 +43,13 @@ public class MainJob {
         return  readyForJobNeuralNetwork;
     }
 
+    public void preloadFileWriters() throws IOException {
+        errorKgfWriter = new FileWriter("errorsKgfValues.txt", false);
+        errorGTotalWriter = new FileWriter("errorsGTotalValues.txt", false);
+    }
+
     public void preloadTrainData() throws IOException {
-        File input = new File("src/main/resources/testSet.csv");
+        File input = new File("src/main/resources/trainSet.csv");
         InputStreamReader isr = new InputStreamReader(new FileInputStream(input), StandardCharsets.UTF_8);
         BufferedReader reader = new BufferedReader(isr);
         int colCount;
@@ -93,7 +101,7 @@ public class MainJob {
     }
 
     public void preloadRealJobData() throws IOException {
-        File input = new File("src/main/resources/trainSet.csv");
+        File input = new File("src/main/resources/testSet.csv");
         InputStreamReader isr = new InputStreamReader(new FileInputStream(input), StandardCharsets.UTF_8);
         BufferedReader reader = new BufferedReader(isr);
         int colCount;
@@ -148,7 +156,7 @@ public class MainJob {
         for (int i = 0; i < trainStartData.length; i++) {
             for (int j = 0; j < trainStartData[i].length; j++) {
                 if (trainStartData[i][j] == null) {
-                    trainStartData[i][j] = 0.5d;
+                    trainStartData[i][j] = 0d;
                     continue;
                 }
                 trainStartData[i][j] = (trainStartData[i][j] - minAndMax.get(j).getFirst()) / (minAndMax.get(j).getSecond() - minAndMax.get(j).getFirst());
@@ -157,7 +165,7 @@ public class MainJob {
         for (int i = 0; i < trainResultData.length; i++) {
             for (int j = 0; j < trainResultData[i].length; j++) {
                 if (trainResultData[i][j] == null) {
-                    trainResultData[i][j] = 0.5d;
+                    trainResultData[i][j] = 0d;
                     continue;
                 }
                 trainResultData[i][j] = (trainResultData[i][j] - minAndMax.get(j + 15).getFirst()) / (minAndMax.get(j + 15).getSecond() - minAndMax.get(j + 15).getFirst());
@@ -166,7 +174,7 @@ public class MainJob {
         for (int i = 0; i < realJobStartData.length; i++) {
             for (int j = 0; j < realJobStartData[i].length; j++) {
                 if (realJobStartData[i][j] == null) {
-                    realJobStartData[i][j] = 0.5d;
+                    realJobStartData[i][j] = 0d;
                     continue;
                 }
                 realJobStartData[i][j] = (realJobStartData[i][j] - minAndMax.get(j).getFirst()) / (minAndMax.get(j).getSecond() - minAndMax.get(j).getFirst());
@@ -175,7 +183,7 @@ public class MainJob {
         for (int i = 0; i < realJobResultData.length; i++) {
             for (int j = 0; j < realJobResultData[i].length; j++) {
                 if (realJobResultData[i][j] == null) {
-                    realJobResultData[i][j] = 0.5d;
+                    realJobResultData[i][j] = 0d;
                     continue;
                 }
                 realJobResultData[i][j] = (realJobResultData[i][j] - minAndMax.get(j + 15).getFirst()) / (minAndMax.get(j + 15).getSecond() - minAndMax.get(j + 15).getFirst());
@@ -183,7 +191,9 @@ public class MainJob {
         }
     }
 
-    public void calculateRealJob(NeuralNetwork readyForJobNeuralNetwork) {
+    public void calculateRealJob(NeuralNetwork readyForJobNeuralNetwork) throws IOException {
+        double kgfRMSEError = 0d;
+        double gTotalRMSEError = 0d;
         for (int i = 0; i < realJobStartData.length; i++) {
             System.out.println("input : " + Arrays.toString(realJobStartData[i]));
             readyForJobNeuralNetwork.setData(realJobStartData[i]);
@@ -192,6 +202,22 @@ public class MainJob {
             System.out.print("result : " + readyForJobNeuralNetwork.getResult());
             System.out.println("expected : " + Arrays.toString(realJobResultData[i]));
             System.out.println("error : " + readyForJobNeuralNetwork.getErrors());
+            double error;
+            error = Double.parseDouble(readyForJobNeuralNetwork.getErrors().split(",")[0].replace("[ ", ""));
+            error = error * error;
+            gTotalRMSEError += error;
+            error = Double.parseDouble(readyForJobNeuralNetwork.getErrors().split(",")[1].replace(" ]", ""));
+            error = error * error;
+            kgfRMSEError += error;
+            errorGTotalWriter.write(readyForJobNeuralNetwork.getErrors().split(",")[0].replace("[ ", "").replace(".", ",").replace(" ", ""));
+            errorGTotalWriter.write("\n");
+            errorKgfWriter.write(readyForJobNeuralNetwork.getErrors().split(",")[1].replace(" ]", "").replace(".", ",").replace(" ", ""));
+            errorGTotalWriter.flush();
+            errorKgfWriter.flush();
         }
+        kgfRMSEError /= realJobStartData.length;
+        gTotalRMSEError /= realJobStartData.length;
+        System.out.println("gTotal rmse : " + Math.sqrt(gTotalRMSEError));
+        System.out.println("kgf rmse : " + Math.sqrt(kgfRMSEError));
     }
 }

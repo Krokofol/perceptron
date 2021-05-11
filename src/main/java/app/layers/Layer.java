@@ -28,7 +28,7 @@ public class Layer {
     public Layer(Integer neuronsNumber, Layer prevLayer) {
         this.prevLayer = prevLayer;
         this.neuronsNumber = neuronsNumber;
-        weights = Matrix.createZeroMatrix(prevLayer.getNeuronsNumber(), neuronsNumber);
+        weights = Matrix.createRandomMatrix(prevLayer.getNeuronsNumber(), neuronsNumber);
         biases = Matrix.createRandomMatrix(1, neuronsNumber);
     }
 

@@ -96,10 +96,10 @@ public class Matrix extends SimpleMatrix {
         for (int i = 0; i < numRows(); i++) {
             result.append("[");
             for (int j = 0; j < numCols(); j++) {
-                result.append(" ").append(get(i, j));
+                result.append(" ").append(get(i, j)).append(",");
             }
             result.append(" ]\n");
         }
-        return result.toString();
+        return result.toString().replace(", ]", " ]");
     }
 }
