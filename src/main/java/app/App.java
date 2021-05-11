@@ -1,14 +1,12 @@
 package app;
 
+import app.layers.MainJob;
+
 public class App {
 
     public static void main (String[] args) {
-//        mainJob();
-        sinAndCosTest();
-    }
-
-    public static void mainJob() {
-
+        new MainJob().mainJob();
+//        sinAndCosTest();
     }
 
     public static void sinAndCosTest() {
@@ -24,14 +22,14 @@ public class App {
             startXValue += Math.PI / 50;
         }
 
-        neuralNetwork.study(studyData, answers, 0.1d, 10000);
+        neuralNetwork.study(studyData, answers, 0.1d, 1000);
 
         for (int i = 0; i < 101; i += 25) {
             neuralNetwork.setData(studyData[i]);
             neuralNetwork.calculate();
             neuralNetwork.calculateErrors(answers[i]);
-            System.out.print(neuralNetwork.getResult());
-            System.out.println(neuralNetwork.getErrors());
+            System.out.print("result : " + neuralNetwork.getResult());
+            System.out.println("error : " + neuralNetwork.getErrors());
         }
     }
 }
