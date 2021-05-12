@@ -10,9 +10,9 @@ import java.util.HashMap;
 public class MainJob {
 
     private static final Integer[] neuronsForLayers = new Integer[]{15, 70, 70, 2};
-    private static final Integer epochsNumber = 5000;
+    private static final Integer epochsNumber = 1000;
     private static final Double studySpeed = 0.01;
-    private static final Double nanReplaceValue = 0.5d;
+    private static final Double nanReplaceValue = 0.0d;
 
     private HashMap<Integer, Pair<Double, Double>> minAndMax;
 
