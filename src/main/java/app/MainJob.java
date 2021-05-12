@@ -10,8 +10,8 @@ import java.util.HashMap;
 public class MainJob {
 
     private static final Integer[] neuronsForLayers = new Integer[]{15, 70, 70, 2};
-    private static final Integer epochsNumber = 5000;
-    private static final Double studySpeed = 0.04;
+    private static final Integer epochsNumber = 1200;
+    private static final Double studySpeed = 0.02;
 
     private HashMap<Integer, Pair<Double, Double>> minAndMax;
 
@@ -54,7 +54,7 @@ public class MainJob {
         BufferedReader reader = new BufferedReader(isr);
         int colCount;
         int rowCount = 1;
-        colCount = reader.readLine().split(",").length;
+        colCount = reader.readLine().split(",").length - 1;
         while (reader.readLine() != null) {
             rowCount++;
         }
@@ -72,7 +72,7 @@ public class MainJob {
             String[] data = reader.readLine().split(",");
             int j;
             for (j = 0; j < colCount - 2; j++) {
-                if (data[j].equals("nan")) {
+                if (data[j].replace(" ", "").equals("nan")) {
                     trainStartData[i][j] = null;
                     continue;
                 }
@@ -85,7 +85,7 @@ public class MainJob {
                 }
             }
             for (;j < colCount; j++) {
-                if (data[j].equals("nan")) {
+                if (data[j].replace(" ", "").equals("nan")) {
                     trainResultData[i][j - 15] = null;
                     continue;
                 }
@@ -123,7 +123,7 @@ public class MainJob {
             String[] data = reader.readLine().split(",");
             int j;
             for (j = 0; j < colCount - 2; j++) {
-                if (data[j].equals("nan")) {
+                if (data[j].replace(" ", "").equals("nan")) {
                     realJobStartData[i][j] = null;
                     continue;
                 }
@@ -136,7 +136,7 @@ public class MainJob {
                 }
             }
             for (;j < colCount; j++) {
-                if (data[j].equals("nan")) {
+                if (data[j].replace(" ", "").equals("nan")) {
                     realJobResultData[i][j - 15] = null;
                     continue;
                 }
