@@ -12,6 +12,7 @@ public class MainJob {
     private static final Integer[] neuronsForLayers = new Integer[]{15, 70, 70, 2};
     private static final Integer epochsNumber = 5000;
     private static final Double studySpeed = 0.01;
+    private static final Double nanReplaceValue = 0.5d;
 
     private HashMap<Integer, Pair<Double, Double>> minAndMax;
 
@@ -156,7 +157,7 @@ public class MainJob {
         for (int i = 0; i < trainStartData.length; i++) {
             for (int j = 0; j < trainStartData[i].length; j++) {
                 if (trainStartData[i][j] == null) {
-                    trainStartData[i][j] = 0d;
+                    trainStartData[i][j] = nanReplaceValue;
                     continue;
                 }
                 trainStartData[i][j] = (trainStartData[i][j] - minAndMax.get(j).getFirst()) / (minAndMax.get(j).getSecond() - minAndMax.get(j).getFirst());
@@ -165,7 +166,7 @@ public class MainJob {
         for (int i = 0; i < trainResultData.length; i++) {
             for (int j = 0; j < trainResultData[i].length; j++) {
                 if (trainResultData[i][j] == null) {
-                    trainResultData[i][j] = 0d;
+                    trainResultData[i][j] = nanReplaceValue;
                     continue;
                 }
                 trainResultData[i][j] = (trainResultData[i][j] - minAndMax.get(j + 15).getFirst()) / (minAndMax.get(j + 15).getSecond() - minAndMax.get(j + 15).getFirst());
@@ -174,7 +175,7 @@ public class MainJob {
         for (int i = 0; i < realJobStartData.length; i++) {
             for (int j = 0; j < realJobStartData[i].length; j++) {
                 if (realJobStartData[i][j] == null) {
-                    realJobStartData[i][j] = 0d;
+                    realJobStartData[i][j] = nanReplaceValue;
                     continue;
                 }
                 realJobStartData[i][j] = (realJobStartData[i][j] - minAndMax.get(j).getFirst()) / (minAndMax.get(j).getSecond() - minAndMax.get(j).getFirst());
@@ -183,7 +184,7 @@ public class MainJob {
         for (int i = 0; i < realJobResultData.length; i++) {
             for (int j = 0; j < realJobResultData[i].length; j++) {
                 if (realJobResultData[i][j] == null) {
-                    realJobResultData[i][j] = 0d;
+                    realJobResultData[i][j] = nanReplaceValue;
                     continue;
                 }
                 realJobResultData[i][j] = (realJobResultData[i][j] - minAndMax.get(j + 15).getFirst()) / (minAndMax.get(j + 15).getSecond() - minAndMax.get(j + 15).getFirst());
